@@ -1,3 +1,4 @@
+import utility.BitToHex;
 import utility.BsnGenerator;
 import utility.CopyToClipboard;
 import utility.IbanGenerator;
@@ -9,5 +10,7 @@ public class Main {
         System.out.println("IBAN: " + result + " copied to clipboard!");
 
         System.out.println("Bsn:" + BsnGenerator.generate());
+
+        System.out.println("Hex: " + BitToHex.ParseBitToHex(4));
     }
 }
