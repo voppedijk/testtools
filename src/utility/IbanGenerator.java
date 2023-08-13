@@ -5,21 +5,23 @@ import java.util.Random;
 
 public class IbanGenerator {
 
-    private final String randomBankNumber;
-    private final String controlNumber;
-
-    private IbanGenerator() {
-        this.randomBankNumber = generateRandomNumber();
-        this.controlNumber = calculateControlNumber();
-    }
-
     public static String generateIban() {
+        String controlNumber;
+        String randomBankNumber;
         IbanGenerator ibanGenerator = new IbanGenerator();
 
-        return "NL" + ibanGenerator.controlNumber + "INGB" + ibanGenerator.randomBankNumber;
+        String result;
+
+        do {
+            randomBankNumber = ibanGenerator.generateRandomNumber();
+            controlNumber = ibanGenerator.calculateControlNumber(randomBankNumber);
+            result = "NL" + controlNumber + "INGB" + randomBankNumber;
+        } while (!ibanGenerator.isValidIban(result));
+
+        return "NL" + controlNumber + "INGB" + randomBankNumber;
     }
 
-    private String calculateControlNumber() {
+    private String calculateControlNumber(String randomBankNumber) {
         String bankToNumber = "18231611";
         String country = "2321";
         String result;
@@ -46,5 +48,18 @@ public class IbanGenerator {
         }
 
         return randomNumber.toString();
+    }
+
+    private boolean isValidIban(String iban) {
+        StringBuilder sb = new StringBuilder(iban);
+        String firstFourchars = iban.substring(0, 4);
+        sb.delete(0, 4);
+        sb.append(firstFourchars);
+        sb.replace(0, 4, "18231611");
+        sb.replace(sb.indexOf("NL"), sb.indexOf("NL") + 2, "2321");
+        BigInteger resultBigInt = new BigInteger(sb.toString());
+        BigInteger result = resultBigInt.mod(new BigInteger("97"));
+
+        return result.intValue() == 1;
     }
 }
